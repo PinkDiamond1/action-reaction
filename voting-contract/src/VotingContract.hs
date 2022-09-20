@@ -45,10 +45,10 @@ import           CheckFuncs
 {- |
   Author   : The Ancient Kraken
   Copyright: 2022
-  Version  : Rev 2
+  Version  : Rev 1
 -}
 lockPid :: PlutusV2.CurrencySymbol
-lockPid = PlutusV2.CurrencySymbol {PlutusV2.unCurrencySymbol = createBuiltinByteString [86, 19, 166, 8, 166, 59, 78, 115, 117, 70, 118, 139, 197, 129, 162, 143, 216, 217, 215, 8, 146, 203, 180, 185, 231, 117, 154, 80] }
+lockPid = PlutusV2.CurrencySymbol {PlutusV2.unCurrencySymbol = createBuiltinByteString [172, 219, 54, 158, 35, 235, 107, 196, 81, 223, 113, 35, 87, 20, 88, 25, 116, 123, 102, 201, 18, 5, 212, 88, 86, 134, 47, 130] }
 
 lockTkn :: PlutusV2.TokenName
 lockTkn = PlutusV2.TokenName {PlutusV2.unTokenName = createBuiltinByteString [97, 99, 116, 105, 111, 110, 95, 116, 111, 107, 101, 110] }
@@ -61,9 +61,9 @@ lockValue = Value.singleton lockPid lockTkn (1 :: Integer)
 -------------------------------------------------------------------------------
 data DelegationType = DelegationType
     { dtPkh    :: PlutusV2.PubKeyHash
-    -- ^ The did public key hash.
+    -- ^ The rep's public key hash.
     , dtIouPid :: PlutusV2.CurrencySymbol
-    -- ^ The dids iou policy id.
+    -- ^ The delegator's iou policy id.
     }
 PlutusTx.unstableMakeIsData ''DelegationType
 -------------------------------------------------------------------------------
@@ -82,15 +82,12 @@ PlutusTx.unstableMakeIsData ''CustomDatumType
 updateThresholdAmount :: CustomDatumType -> CustomDatumType -> Bool
 updateThresholdAmount a b = ( cdtPid a == cdtPid b ) &&
                             ( cdtTkn a == cdtTkn b ) &&
-                            ( cdtAmt a /= cdtAmt b ) -- should this be greater than or some bound function?
+                            ( cdtAmt a /= cdtAmt b )    -- should this be greater than or some bound function?
 -------------------------------------------------------------------------------
 -- | Create the redeemer type.
 -------------------------------------------------------------------------------
-data CustomRedeemerType = Vote   |
-                          Debug
-PlutusTx.makeIsDataIndexed ''CustomRedeemerType [ ('Vote,  0)
-                                                , ('Debug, 1)
-                                                ]
+data CustomRedeemerType = Vote
+PlutusTx.makeIsDataIndexed ''CustomRedeemerType [ ('Vote,  0) ]
 -------------------------------------------------------------------------------
 -- | mkValidator :: Datum -> Redeemer -> ScriptContext -> Bool
 -------------------------------------------------------------------------------
@@ -99,13 +96,13 @@ mkValidator :: CustomDatumType -> CustomRedeemerType -> PlutusV2.ScriptContext -
 mkValidator datum redeemer context =
   case redeemer of
     Vote -> do 
-      { let a = traceIfFalse "Voting Has Failed Error"   $ checkReferenceSigners txRefInputs (Value.singleton Value.adaSymbol Value.adaToken (0 :: Integer))
-      ; let b = traceIfFalse "Single Script Input Error" $ isNInputs txInputs 1 && isNOutputs contOutputs 1
-      ; let c = traceIfFalse "Missing Starter NFT Error" $ Value.geq validatingValue lockValue
-      ; let d = traceIfFalse "Datum Update Error"        $ isEmbeddedDatum contOutputs
+      { let emptyValue = Value.singleton Value.adaSymbol Value.adaToken (0 :: Integer)
+      ; let a = traceIfFalse "Voting Has Failed Error"   $ checkReferenceSigners txRefInputs emptyValue     -- search for ref inputs then reg inputs
+      ; let b = traceIfFalse "Single Script Input Error" $ isNInputs txInputs 1 && isNOutputs contOutputs 1 -- 1 script input, 1 script output
+      ; let c = traceIfFalse "Missing Starter NFT Error" $ Value.geq validatingValue lockValue              -- must hold starter token
+      ; let d = traceIfFalse "Datum Update Error"        $ isEmbeddedDatum contOutputs                      -- value conts and the datum is correct
       ;         traceIfFalse "Vote Endpoint Error"       $ all (==True) [a,b,c,d]
       }
-    Debug -> True
    where
     info :: PlutusV2.TxInfo
     info = PlutusV2.scriptContextTxInfo context
@@ -116,11 +113,11 @@ mkValidator datum redeemer context =
 
     -- tx inputs
     txInputs :: [PlutusV2.TxInInfo]
-    txInputs = PlutusV2.txInfoInputs  info
+    txInputs = PlutusV2.txInfoInputs info
 
-    -- tx inputs
+    -- tx ref inputs
     txRefInputs :: [PlutusV2.TxInInfo]
-    txRefInputs = PlutusV2.txInfoReferenceInputs  info
+    txRefInputs = PlutusV2.txInfoReferenceInputs info
 
     -- token that is being validated
     validatingValue :: PlutusV2.Value
@@ -159,10 +156,9 @@ mkValidator datum redeemer context =
             Nothing     -> checkReferenceSigners xs val
             Just inline -> 
               if ContextsV2.txSignedBy info (dtPkh inline)
-              then checkReferenceSigners xs (val + (PlutusV2.txOutValue $ PlutusV2.txInInfoResolved x))
+              then checkReferenceSigners xs (val + (PlutusV2.txOutValue $ PlutusV2.txInInfoResolved x)) -- if they sign then add their value
               else checkReferenceSigners xs val
         
-                  
 -------------------------------------------------------------------------------
 -- | Now we need to compile the Validator.
 -------------------------------------------------------------------------------

@@ -41,7 +41,7 @@ import           PlutusTx.Prelude
 {- |
   Author   : The Ancient Kraken
   Copyright: 2022
-  Version  : Rev 2
+  Version  : Rev 1
 -}
 -------------------------------------------------------------------------
 -- | Create a proper Address Type.

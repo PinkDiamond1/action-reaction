@@ -48,17 +48,13 @@ import           CheckFuncs
 -}
 
 lockPid :: PlutusV2.CurrencySymbol
-lockPid = PlutusV2.CurrencySymbol {PlutusV2.unCurrencySymbol = createBuiltinByteString [86, 19, 166, 8, 166, 59, 78, 115, 117, 70, 118, 139, 197, 129, 162, 143, 216, 217, 215, 8, 146, 203, 180, 185, 231, 117, 154, 80] }
+lockPid = PlutusV2.CurrencySymbol {PlutusV2.unCurrencySymbol = createBuiltinByteString [172, 219, 54, 158, 35, 235, 107, 196, 81, 223, 113, 35, 87, 20, 88, 25, 116, 123, 102, 201, 18, 5, 212, 88, 86, 134, 47, 130] }
 
 lockTkn :: PlutusV2.TokenName
 lockTkn = PlutusV2.TokenName {PlutusV2.unTokenName = createBuiltinByteString [97, 99, 116, 105, 111, 110, 95, 116, 111, 107, 101, 110] }
 
 lockValue :: PlutusV2.Value
 lockValue = Value.singleton lockPid lockTkn (1 :: Integer)
-
--- token name for currency
-tokenName :: PlutusV2.TokenName
-tokenName = lockTkn
 
 -------------------------------------------------------------------------------
 -- | Create the datum parameters data object.
@@ -67,15 +63,15 @@ data CustomDatumType = CustomDatumType
   { cdtPolicyId :: PlutusV2.CurrencySymbol
   -- ^ The policy id from the minting script.
   , cdtNumber   :: Integer
-  -- ^ The starting number for the catalog.
+  -- ^ The reward counter, starts a zero.
   }
 PlutusTx.unstableMakeIsData ''CustomDatumType
 
 checkDatumIncrease :: CustomDatumType -> CustomDatumType -> Bool
 checkDatumIncrease a b =  ( cdtPolicyId    a == cdtPolicyId b ) &&
-                          ( cdtNumber  a + 1 == cdtNumber   b )
+                          ( cdtNumber  a + 1 == cdtNumber   b )    -- can only increase by one
 
--- old === new | burning
+-- old === new
 instance Eq CustomDatumType where
   {-# INLINABLE (==) #-}
   a == b =  ( cdtPolicyId a == cdtPolicyId b ) &&
@@ -83,11 +79,8 @@ instance Eq CustomDatumType where
 -------------------------------------------------------------------------------
 -- | Create the redeemer type.
 -------------------------------------------------------------------------------
-data CustomRedeemerType = Mint  |
-                          Debug
-PlutusTx.makeIsDataIndexed ''CustomRedeemerType [ ( 'Mint,  0 )
-                                                , ( 'Debug, 1 )
-                                                ]
+data CustomRedeemerType = Mint
+PlutusTx.makeIsDataIndexed ''CustomRedeemerType [ ( 'Mint,  0 ) ]
 -------------------------------------------------------------------------------
 -- | mkValidator :: Datum -> Redeemer -> ScriptContext -> Bool
 -------------------------------------------------------------------------------
@@ -96,22 +89,21 @@ mkValidator :: CustomDatumType -> CustomRedeemerType -> PlutusV2.ScriptContext -
 mkValidator datum redeemer context =
   case redeemer of
     Mint -> do
-      { let a = traceIfFalse "Single In/Out Error" $ isNInputs txInputs 1 && isNOutputs contOutputs 1 -- 1 script input 1 script output
-      ; let b = traceIfFalse "NFT Minting Error"   $ checkMintedAmount                                -- mint an nft only
-      ; let c = traceIfFalse "Invalid Datum Error" $ isEmbeddedDatumIncreasing contOutputs            -- value is cont and the datum is correct.
-      ; let d = traceIfFalse "Invalid Start Token" $ Value.geq validatingValue lockValue              -- must contain the start token
+      { let a = traceIfFalse "Single In/Out Error" $ isNInputs txInputs 1 && isNOutputs contOutputs 1 -- 1 script input, 1 script output
+      ; let b = traceIfFalse "FT Minting Error"    $ checkMintedAmount                                -- mint correct reward only
+      ; let c = traceIfFalse "Invalid Datum Error" $ isEmbeddedDatumIncreasing contOutputs            -- value is cont and the datum is increasing.
+      ; let d = traceIfFalse "Invalid Start Token" $ Value.geq validatingValue lockValue              -- must hold the starter token
       ;         traceIfFalse "Locking:Mint Error"  $ all (==True) [a,b,c,d]
       }
-    Debug -> True
    where
     info :: PlutusV2.TxInfo
-    info = PlutusV2.scriptContextTxInfo  context
+    info = PlutusV2.scriptContextTxInfo context
 
     contOutputs :: [PlutusV2.TxOut]
     contOutputs = ContextsV2.getContinuingOutputs context
 
     txInputs :: [PlutusV2.TxInInfo]
-    txInputs = PlutusV2.txInfoInputs  info
+    txInputs = PlutusV2.txInfoInputs info
 
     -- token info
     validatingValue :: PlutusV2.Value
@@ -125,7 +117,7 @@ mkValidator datum redeemer context =
     checkMintedAmount =
       let reward = rewardAmount $ cdtNumber datum 
       in case Value.flattenValue (PlutusV2.txInfoMint info) of
-        [(cs, tkn, amt)] -> (cs == cdtPolicyId datum) && (tkn == tokenName) && (amt == reward)
+        [(cs, tkn, amt)] -> (cs == cdtPolicyId datum) && (tkn == lockTkn) && (amt == reward)
         _                -> traceIfFalse "Incorrect Minting Info" False
     
     -- datum stuff
@@ -140,8 +132,8 @@ mkValidator datum redeemer context =
             -- inline datum only
             (PlutusV2.OutputDatum (PlutusV2.Datum d)) -> 
               case PlutusTx.fromBuiltinData d of
-                Nothing     -> isEmbeddedDatumIncreasing xs -- bad data
-                Just inline -> checkDatumIncrease datum inline
+                Nothing     -> isEmbeddedDatumIncreasing xs    -- bad data
+                Just inline -> checkDatumIncrease datum inline -- check for good data
         else isEmbeddedDatumIncreasing xs
 
 -------------------------------------------------------------------------------

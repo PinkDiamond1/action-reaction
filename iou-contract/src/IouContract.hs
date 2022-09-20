@@ -45,7 +45,7 @@ import           Plutus.Script.Utils.V2.Scripts as Utils
 {-
   Author   : The Ancient Kraken
   Copyright: 2022
-  Version  : Rev 2
+  Version  : Rev 1
 -}
 -------------------------------------------------------------------------------
 -- | Create a proper bytestring
@@ -58,7 +58,7 @@ createBuiltinByteString intList = flattenBuiltinByteString [ consByteString x em
     flattenBuiltinByteString (x:xs) = appendByteString x (flattenBuiltinByteString xs)
 
 getValidatorHash :: PlutusV2.ValidatorHash
-getValidatorHash = PlutusV2.ValidatorHash $ createBuiltinByteString [32, 27, 19, 76, 254, 167, 197, 53, 245, 130, 24, 122, 60, 42, 5, 87, 41, 59, 247, 93, 233, 133, 233, 85, 246, 162, 69, 88]
+getValidatorHash = PlutusV2.ValidatorHash $ createBuiltinByteString [20, 82, 92, 217, 212, 173, 57, 148, 93, 163, 42, 51, 137, 124, 122, 234, 1, 70, 81, 0, 237, 247, 235, 237, 14, 13, 114, 67]
 
 iouTkn :: PlutusV2.TokenName
 iouTkn = PlutusV2.TokenName {PlutusV2.unTokenName = createBuiltinByteString [105, 111, 117]}
@@ -67,9 +67,9 @@ iouTkn = PlutusV2.TokenName {PlutusV2.unTokenName = createBuiltinByteString [105
 -------------------------------------------------------------------------------
 data CustomRedeemerType = CustomRedeemerType
     { crtPkh :: PlutusV2.PubKeyHash
-    -- ^ The iou public key hash.
+    -- ^ The representor's public key hash.
     , crtIouPid :: PlutusV2.CurrencySymbol
-    -- ^ The ious iou policy id.
+    -- ^ The iou policy id.
     }
 PlutusTx.unstableMakeIsData ''CustomRedeemerType
 -- old == new
@@ -77,15 +77,13 @@ instance Eq CustomRedeemerType where
   {-# INLINABLE (==) #-}
   a == b = ( crtPkh    a == crtPkh    b ) &&
            ( crtIouPid a == crtIouPid b )
-
-
 -------------------------------------------------------------------------------
 -- | mkValidator :: Datum -> Redeemer -> ScriptContext -> Bool
 -------------------------------------------------------------------------------
 {-# INLINABLE mkPolicy #-}
 mkPolicy :: BuiltinData -> PlutusV2.ScriptContext -> Bool
 mkPolicy _ context = do
-      { let a = traceIfFalse "Mint / Burn Error" $ (checkTokenMint && checkMintDatum) -- mint
+      { let a = traceIfFalse "Mint / Burn Error" $ (checkTokenMint && checkMintDatum)
       ;         traceIfFalse "Minting Error"     $ all (==True) [a]
       }
   where
@@ -95,6 +93,13 @@ mkPolicy _ context = do
     txInputs :: [PlutusV2.TxInInfo]
     txInputs = ContextsV2.txInfoInputs info
     
+    -- check the minting stuff here
+    checkTokenMint :: Bool
+    checkTokenMint =
+      case Value.flattenValue (PlutusV2.txInfoMint info) of
+        [(cs, tkn, _)] -> cs == ContextsV2.ownCurrencySymbol context && tkn == iouTkn
+        _              -> traceIfFalse "Mint Error" False
+
     -- check that the locking script has the correct datum hash
     checkMintDatum :: Bool
     checkMintDatum =
@@ -105,26 +110,27 @@ mkPolicy _ context = do
             Nothing          -> traceIfFalse "No Output Datum" False
             Just outputDatum -> inputDatum == outputDatum
     
-    -- check if the incoming datum is the correct form.
-    getDatumFromTxOut :: PlutusV2.TxOut -> Maybe CustomRedeemerType
-    getDatumFromTxOut x = 
-      case PlutusV2.txOutDatum x of
-        PlutusV2.NoOutputDatum       -> Nothing -- datumless
-        (PlutusV2.OutputDatumHash _) -> Nothing -- embedded datum
-        -- inline datum
-        (PlutusV2.OutputDatum (PlutusV2.Datum d)) -> 
-          case PlutusTx.fromBuiltinData d of
-            Nothing     -> Nothing
-            Just inline -> Just $ PlutusTx.unsafeFromBuiltinData @CustomRedeemerType inline
-    
     -- return the first datum hash from a txout going to the locking script
     checkInputs :: [PlutusV2.TxInInfo] -> Maybe CustomRedeemerType
     checkInputs [] = Nothing
     checkInputs (x:xs) =
       if PlutusV2.txOutAddress (PlutusV2.txInInfoResolved x) == Addr.scriptHashAddress getValidatorHash
-      then getDatumFromTxOut $ PlutusV2.txInInfoResolved x
-      else checkInputs xs
-
+        then getDatumFromTxOut $ PlutusV2.txInInfoResolved x
+        else checkInputs xs
+      where
+        -- check if the incoming datum is the correct form.
+        getDatumFromTxOut :: PlutusV2.TxOut -> Maybe CustomRedeemerType
+        getDatumFromTxOut x' = 
+          case PlutusV2.txOutDatum x' of
+            PlutusV2.NoOutputDatum       -> Nothing -- datumless
+            (PlutusV2.OutputDatumHash _) -> Nothing -- embedded datum
+            -- inline datum
+            (PlutusV2.OutputDatum (PlutusV2.Datum d)) -> 
+              case PlutusTx.fromBuiltinData d of
+                Nothing     -> Nothing
+                Just inline -> Just $ PlutusTx.unsafeFromBuiltinData @CustomRedeemerType inline
+    
+    -- the datum at the represent validator 
     datumAtValidator :: Maybe CustomRedeemerType
     datumAtValidator =
       if length scriptOutputs == 0 
@@ -143,14 +149,6 @@ mkPolicy _ context = do
         scriptOutputs :: [(PlutusV2.OutputDatum, PlutusV2.Value)]
         scriptOutputs = ContextsV2.scriptOutputsAt getValidatorHash info
         
-    -- check the minting stuff here
-    checkTokenMint :: Bool
-    checkTokenMint =
-      case Value.flattenValue (PlutusV2.txInfoMint info) of
-        [(cs, tkn, _)] -> cs == ContextsV2.ownCurrencySymbol context && tkn == iouTkn
-        _              -> traceIfFalse "Mint Error" False
-    
-    
 -------------------------------------------------------------------------------
 policy :: PlutusV2.MintingPolicy
 policy = PlutusV2.mkMintingPolicyScript $$(PlutusTx.compile [|| wrap ||])

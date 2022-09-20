@@ -45,17 +45,16 @@ import           CheckFuncs
 {- |
   Author   : The Ancient Kraken
   Copyright: 2022
-  Version  : Rev 2
+  Version  : Rev 1
 -}
 iouTkn :: PlutusV2.TokenName
 iouTkn = PlutusV2.TokenName {PlutusV2.unTokenName = createBuiltinByteString [105, 111, 117]}
 
--- voting validator hash
 voteValidatorHash :: PlutusV2.ValidatorHash
-voteValidatorHash = PlutusV2.ValidatorHash $ createBuiltinByteString [198, 130, 92, 225, 91, 182, 128, 151, 220, 205, 233, 185, 185, 188, 113, 178, 100, 203, 171, 241, 147, 82, 249, 217, 149, 139, 36, 137]
+voteValidatorHash = PlutusV2.ValidatorHash $ createBuiltinByteString [195, 129, 178, 108, 139, 9, 107, 159, 35, 206, 75, 6, 116, 28, 212, 166, 87, 81, 202, 211, 93, 12, 221, 52, 7, 17, 202, 5]
 
 lockPid :: PlutusV2.CurrencySymbol
-lockPid = PlutusV2.CurrencySymbol {PlutusV2.unCurrencySymbol = createBuiltinByteString [86, 19, 166, 8, 166, 59, 78, 115, 117, 70, 118, 139, 197, 129, 162, 143, 216, 217, 215, 8, 146, 203, 180, 185, 231, 117, 154, 80] }
+lockPid = PlutusV2.CurrencySymbol {PlutusV2.unCurrencySymbol = createBuiltinByteString [172, 219, 54, 158, 35, 235, 107, 196, 81, 223, 113, 35, 87, 20, 88, 25, 116, 123, 102, 201, 18, 5, 212, 88, 86, 134, 47, 130] }
 
 lockTkn :: PlutusV2.TokenName
 lockTkn = PlutusV2.TokenName {PlutusV2.unTokenName = createBuiltinByteString [97, 99, 116, 105, 111, 110, 95, 116, 111, 107, 101, 110] }
@@ -80,9 +79,9 @@ PlutusTx.unstableMakeIsData ''VoteDatumType
 -------------------------------------------------------------------------------
 data CustomDatumType = CustomDatumType
     { cdtPkh    :: PlutusV2.PubKeyHash
-    -- ^ The did public key hash.
+    -- ^ The representor's public key hash.
     , cdtIouPid :: PlutusV2.CurrencySymbol
-    -- ^ The dids iou policy id.
+    -- ^ The iou policy id.
     }
 PlutusTx.unstableMakeIsData ''CustomDatumType
 -- old == new
@@ -120,32 +119,32 @@ mkValidator :: CustomDatumType -> CustomRedeemerType -> PlutusV2.ScriptContext -
 mkValidator datum redeemer context =
   case redeemer of
     Remove -> do 
-      { let a = traceIfFalse "Signing Tx Error"     $ ContextsV2.txSignedBy info (cdtPkh datum)
-      ; let b = traceIfFalse "Voters Are Delegated" $ hasVotngTokens
-      ; let c = traceIfFalse "Single Script Error"  $ isSingleScript txInputs && isSingleScript txRefInputs
+      { let a = traceIfFalse "Signing Tx Error"     $ ContextsV2.txSignedBy info (cdtPkh datum)             -- must be signed by rep
+      ; let b = traceIfFalse "Voters Are Delegated" $ hasVotngTokens                                        -- can not hold any voting tokens in tx
+      ; let c = traceIfFalse "Single Script Error"  $ isSingleScript txInputs && isSingleScript txRefInputs -- single input single output
       ;         traceIfFalse "Remove Error"         $ all (==True) [a,b,c]
       }
     (Increase ut)-> do 
       { let increase     = updateAmt ut
       ; let outboundAddr = createAddress (updaterPkh ut) (updaterSc ut)
       ; let payout       = Value.singleton (cdtIouPid datum) iouTkn increase
-      ; let a = traceIfFalse "Single Script Error"  $ isSingleScript txInputs && isSingleScript txRefInputs
-      ; let b = traceIfFalse "Cont Payin Error"     $ isValueIncreasing increase
-      ; let c = traceIfFalse "Wrong Datum Error"    $ isDatumConstant contOutputs
-      ; let d = traceIfFalse "Minting Error"        $ checkMintingProcess increase
-      ; let e = traceIfFalse "Minting Payout Error" $ isAddrGettingPaid txOutputs outboundAddr payout -- can allow ada too
-      ; let f = traceIfFalse "Signing Tx Error"     $ ContextsV2.txSignedBy info (updaterPkh ut)
+      ; let a = traceIfFalse "Single Script Error"  $ isSingleScript txInputs && isSingleScript txRefInputs -- single in and single ref
+      ; let b = traceIfFalse "Cont Payin Error"     $ isValueIncreasing increase                            -- value increases by increase amount
+      ; let c = traceIfFalse "Wrong Datum Error"    $ isDatumConstant contOutputs                           -- datum cant change
+      ; let d = traceIfFalse "Minting Error"        $ checkMintingProcess increase                          -- mint out the iou tokens
+      ; let e = traceIfFalse "Minting Payout Error" $ isAddrGettingPaid txOutputs outboundAddr payout       -- can allow ada too
+      ; let f = traceIfFalse "Signing Tx Error"     $ ContextsV2.txSignedBy info (updaterPkh ut)            -- wallet must be signers
       ;         traceIfFalse "Increase Error"       $ all (==True) [a,b,c,d,e,f]
       }
     (Decrease ut)-> do 
       { let decrease     = updateAmt ut
       ; let outboundAddr = createAddress (updaterPkh ut) (updaterSc ut)
-      ; let a = traceIfFalse "Single Script Error" $ isSingleScript txInputs && isSingleScript txRefInputs
-      ; let b = traceIfFalse "Cont Payin Error"    $ isValueDecreasing decrease
-      ; let c = traceIfFalse "Wrong Datum Error"   $ isDatumConstant contOutputs
-      ; let d = traceIfFalse "Burning Error"       $ checkMintingProcess ((-1 :: Integer) * decrease)
-      ; let e = traceIfFalse "FT Payout Error"     $ isVotingTokenReturning outboundAddr decrease -- can allow ada too
-      ; let f = traceIfFalse "Signing Tx Error"    $ ContextsV2.txSignedBy info (updaterPkh ut)
+      ; let a = traceIfFalse "Single Script Error" $ isSingleScript txInputs && isSingleScript txRefInputs -- single input and single ref
+      ; let b = traceIfFalse "Cont Payin Error"    $ isValueDecreasing decrease                            -- the value must decrease by decrease amount
+      ; let c = traceIfFalse "Wrong Datum Error"   $ isDatumConstant contOutputs                           -- the datum can not change
+      ; let d = traceIfFalse "Burning Error"       $ checkMintingProcess ((-1 :: Integer) * decrease)      -- need to burn iou tokens
+      ; let e = traceIfFalse "FT Payout Error"     $ isVotingTokenReturning outboundAddr decrease          -- can allow ada too
+      ; let f = traceIfFalse "Signing Tx Error"    $ ContextsV2.txSignedBy info (updaterPkh ut)            -- wallet must sign
       ;         traceIfFalse "Decrease Error"      $ all (==True) [a,b,c,d,e,f]
       }
    where
@@ -232,11 +231,10 @@ mkValidator datum redeemer context =
         PlutusV2.NoOutputDatum       -> Nothing -- datumless
         (PlutusV2.OutputDatumHash _) -> Nothing -- embedded datum
         -- inline datum
-        (PlutusV2.OutputDatum (PlutusV2.Datum d)) -> --Just $ PlutusTx.unsafeFromBuiltinData @VoteDatumType d
+        (PlutusV2.OutputDatum (PlutusV2.Datum d)) ->
           case PlutusTx.fromBuiltinData d of
             Nothing     -> Nothing
             Just inline -> Just $ PlutusTx.unsafeFromBuiltinData @VoteDatumType inline
-        
 
     -- token info
     voterTokenValue :: PlutusV2.Value -> PlutusV2.CurrencySymbol -> PlutusV2.TokenName -> Integer

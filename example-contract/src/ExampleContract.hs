@@ -49,10 +49,10 @@ import           CheckFuncs
   Version  : Rev 1
 -}
 voteValidatorHash :: PlutusV2.ValidatorHash
-voteValidatorHash = PlutusV2.ValidatorHash $ createBuiltinByteString [198, 130, 92, 225, 91, 182, 128, 151, 220, 205, 233, 185, 185, 188, 113, 178, 100, 203, 171, 241, 147, 82, 249, 217, 149, 139, 36, 137]
+voteValidatorHash = PlutusV2.ValidatorHash $ createBuiltinByteString [195, 129, 178, 108, 139, 9, 107, 159, 35, 206, 75, 6, 116, 28, 212, 166, 87, 81, 202, 211, 93, 12, 221, 52, 7, 17, 202, 5]
 
 lockPid :: PlutusV2.CurrencySymbol
-lockPid = PlutusV2.CurrencySymbol {PlutusV2.unCurrencySymbol = createBuiltinByteString [86, 19, 166, 8, 166, 59, 78, 115, 117, 70, 118, 139, 197, 129, 162, 143, 216, 217, 215, 8, 146, 203, 180, 185, 231, 117, 154, 80] }
+lockPid = PlutusV2.CurrencySymbol {PlutusV2.unCurrencySymbol = createBuiltinByteString [172, 219, 54, 158, 35, 235, 107, 196, 81, 223, 113, 35, 87, 20, 88, 25, 116, 123, 102, 201, 18, 5, 212, 88, 86, 134, 47, 130] }
 
 lockTkn :: PlutusV2.TokenName
 lockTkn = PlutusV2.TokenName {PlutusV2.unTokenName = createBuiltinByteString [97, 99, 116, 105, 111, 110, 95, 116, 111, 107, 101, 110] }

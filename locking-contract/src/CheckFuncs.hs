@@ -45,6 +45,7 @@ import           PlutusTx.Prelude
 -------------------------------------------------------------------------------
 -- | Calculate total rewards and total blocks(mints).
 -------------------------------------------------------------------------------
+-- count how many rewards per utxo
 totalRewards :: Integer -> Integer
 totalRewards mul = totalRewards' 1 0
   where
@@ -57,6 +58,7 @@ totalRewards mul = totalRewards' 1 0
         reward :: Integer
         reward = rewardCalculation num
 
+-- count how many blocks per utxo
 totalBlocks :: Integer -> Integer
 totalBlocks mul = totalBlocks' 1 0
   where
@@ -68,6 +70,8 @@ totalBlocks mul = totalBlocks' 1 0
       where
         reward :: Integer
         reward = rewardCalculation num
+
+-- this just calculates a reward
 rewardCalculation :: Integer -> Integer
 rewardCalculation num = 18000000 - logOfXInBaseB num 2 * 1000000
   where
@@ -77,6 +81,7 @@ rewardCalculation num = 18000000 - logOfXInBaseB num 2 * 1000000
         then 0
         else 1 + logOfXInBaseB (Internal.divideInteger x b) b
 
+-- this is what is used to the correct reward amount
 rewardAmount :: Integer -> Integer
 rewardAmount block =
   if reward < 1000000

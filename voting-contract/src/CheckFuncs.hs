@@ -40,13 +40,11 @@ import           PlutusTx.Prelude
 {- |
   Author   : The Ancient Kraken
   Copyright: 2022
-  Version  : Rev 2
+  Version  : Rev 1
 -}
 -------------------------------------------------------------------------
 -- | Check if the total value contains the threshold value of a token.
--- Add in a way to account for value on the reference inputs that someone signed for.
 -------------------------------------------------------------------------
-
 isVoteComplete :: PlutusV2.CurrencySymbol -> PlutusV2.TokenName -> Integer -> PlutusV2.TxInfo -> PlutusV2.Value -> Bool
 isVoteComplete pid tkn amt info val = do -- remove in production
       { let a = traceIfFalse "Not Enough Vote Tokens"    $ Value.geq totalValue thresholdValue

@@ -46,7 +46,6 @@ library
   hs-source-dirs:       src
 
   exposed-modules:      LockingContract
-                        TokenHelper
                         CheckFuncs
 
   build-depends:        bytestring

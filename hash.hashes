@@ -1,5 +1,5 @@
 287d793d5ce7b4a6448383509b7fe34ba92065ac3386bb472e7d08079653ea98  ./minting-contract/validator.hash
-5fdcc8a48bcff3301e5817156fc88874b5c758f554bf12962c759998499e0453  ./example-contract/validator.hash
-864aece27665e549f6e974d2fa7d90101001a77e0c71622866240516d523086f  ./voting-contract/validator.hash
-fa766bde095226e522186653f68d510f2dbffbdb6ef77164d731871355cbc810  ./represent-contract/validator.hash
-623da75b9e9fba6eb5e9d7243a6b5a61ed29473346f1123cb24eeef3ad21422f  ./locking-contract/validator.hash
+885419d0cba6edc13bec4653f2626d0cda95317f2a2d4d8029f24d68c41e1c7c  ./example-contract/validator.hash
+f1c2bbbd797df241cf57d7a7f9194beac629d33f7ec7532b58b8415263bea9cf  ./voting-contract/validator.hash
+af52a7e7d37ef2de6bdca057919027a87ea593bc20bf22ec373bc1eee1032494  ./represent-contract/validator.hash
+45ea6810be441b17365939d67616c4ed93d0de0c1e05c0f358823a28b9ce710e  ./locking-contract/validator.hash
