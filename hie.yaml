@@ -1,0 +1,12 @@
+cradle:
+  cabal:
+    - path: "./locking-contract/src"
+      component: "locking-contract:lib:locking-contract"
+    - path: "./minting-contract/src"
+      component: "minting-contract:lib:minting-contract"
+    - path: "./voting-contract/src"
+      component: "voting-contract:lib:voting-contract"
+    - path: "./represent-contract/src"
+      component: "represent-contract:lib:represent-contract"
+    - path: "./iou-contract/src"
+      component: "iou-contract:lib:iou-contract"
