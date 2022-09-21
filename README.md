@@ -2,6 +2,16 @@
 
 A system of contracts demonstrating a decentralized hot wallet using an action token and vote representation. This is a set of contracts trying to accomplish an action token distribution, action threshold voting, vote representation, and an example contract using a representitive holding action tokens as the signer for a validation function.
 
+### Building
+
+Building the contracts requires a live node for getting the current slot number. Use the automated build script, complete_build.sh, by supplying a token name.
+
+```bash
+./complete_build.sh action_token
+```
+
+The script folder holds sequential test scripts for using the contracts. They are very basic but do demostrate the use of the contract.
+
 ## Action Tokens
 
 The distribution contract in this repo is an example of a token distribution. The action-reaction system is designed to handle any fungible token, an already existing token or a token that is minted on-the-fly with smart contracts. The action token is use case specific and can be anything.

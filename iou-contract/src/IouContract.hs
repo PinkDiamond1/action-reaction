@@ -58,7 +58,7 @@ createBuiltinByteString intList = flattenBuiltinByteString [ consByteString x em
     flattenBuiltinByteString (x:xs) = appendByteString x (flattenBuiltinByteString xs)
 
 getValidatorHash :: PlutusV2.ValidatorHash
-getValidatorHash = PlutusV2.ValidatorHash $ createBuiltinByteString [20, 82, 92, 217, 212, 173, 57, 148, 93, 163, 42, 51, 137, 124, 122, 234, 1, 70, 81, 0, 237, 247, 235, 237, 14, 13, 114, 67]
+getValidatorHash = PlutusV2.ValidatorHash $ createBuiltinByteString [201, 114, 7, 175, 148, 18, 7, 237, 146, 102, 72, 223, 46, 154, 85, 194, 249, 221, 17, 101, 143, 247, 16, 99, 4, 9, 51, 213]
 
 iouTkn :: PlutusV2.TokenName
 iouTkn = PlutusV2.TokenName {PlutusV2.unTokenName = createBuiltinByteString [105, 111, 117]}

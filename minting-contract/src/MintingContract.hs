@@ -49,7 +49,7 @@ import           Plutus.Script.Utils.V2.Scripts as Utils
   Version  : Rev 1
 -}
 lockPid :: PlutusV2.CurrencySymbol
-lockPid = PlutusV2.CurrencySymbol {PlutusV2.unCurrencySymbol = createBuiltinByteString [172, 219, 54, 158, 35, 235, 107, 196, 81, 223, 113, 35, 87, 20, 88, 25, 116, 123, 102, 201, 18, 5, 212, 88, 86, 134, 47, 130] }
+lockPid = PlutusV2.CurrencySymbol {PlutusV2.unCurrencySymbol = createBuiltinByteString [79, 12, 163, 101, 213, 218, 28, 33, 71, 246, 155, 113, 91, 185, 29, 191, 24, 14, 59, 209, 195, 211, 11, 183, 60, 116, 15, 207] }
 
 lockTkn :: PlutusV2.TokenName
 lockTkn = PlutusV2.TokenName {PlutusV2.unTokenName = createBuiltinByteString [97, 99, 116, 105, 111, 110, 95, 116, 111, 107, 101, 110] }
@@ -58,7 +58,7 @@ tokenValue :: PlutusV2.Value
 tokenValue = Value.singleton lockPid lockTkn (1 :: Integer)
 
 getValidatorHash :: PlutusV2.ValidatorHash
-getValidatorHash = PlutusV2.ValidatorHash $ createBuiltinByteString [96, 148, 195, 168, 20, 155, 33, 15, 27, 151, 3, 198, 56, 63, 178, 94, 68, 66, 2, 161, 224, 122, 100, 225, 241, 173, 237, 47]
+getValidatorHash = PlutusV2.ValidatorHash $ createBuiltinByteString [141, 116, 127, 195, 101, 73, 199, 76, 214, 190, 222, 221, 46, 168, 196, 178, 77, 71, 46, 113, 221, 118, 248, 156, 235, 66, 58, 251]
 
 -------------------------------------------------------------------------------
 -- | Create a proper bytestring

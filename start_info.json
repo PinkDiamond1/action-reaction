@@ -4,6 +4,6 @@
   "__comment2__": "The length of time the starter nft policy script is open.",
   "cutOff": 1500,
   "__comment3__": "These two fields are auto filled with complete_build.sh",
-  "starterPid": "acdb369e23eb6bc451df712357145819747b66c91205d45856862f82",
+  "starterPid": "4f0ca365d5da1c2147f69b715bb91dbf180e3bd1c3d30bb73c740fcf",
   "starterTkn": "616374696f6e5f746f6b656e"
 }

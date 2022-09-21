@@ -1,7 +1,7 @@
 #!/bin/bash
 # set -e
 if [[ $# -eq 0 ]] ; then
-    echo 'Please Supply A Token Name That Will Be Used For The Starter  And The Catalog Name'
+    echo 'Please Supply A Token Name That Will Be Used For The Starter And The Action Token Name'
     exit 1
 fi
 # Complete Build
