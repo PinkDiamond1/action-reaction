@@ -4,7 +4,11 @@ A system of contracts demonstrating a decentralized hot wallet using an action t
 
 ## Action Tokens
 
-The action token distribution is handled via a finite supply contract, via a lock and mint combo, incentivising early adoptors with larger rewards of the action token. The reward function decreases logarithmically with each transaction, depleting in 262,143 transactions for a total of 524,268 action tokens. This specific contract is an example of a token distribution for the repo. The action-reaction system is designed to handle any fungible token, already existing or minted on-the-fly with smart contracts.
+The distribution contract in this repo is an example of a token distribution. The action-reaction system is designed to handle any fungible token, an already existing token or a token that is minted on-the-fly with smart contracts. The action token is use case specific and can be anything.
+
+### The Token Distribution
+
+In this repo, the action token distribution is handled via a finite supply contract, via a lock and mint combo, incentivising early adoptors with larger rewards of the action token. The reward function decreases logarithmically with each transaction, depleting in 262,143 transactions for a total of 524,268 action tokens. 
 
 ![first 1000 transactions](./images/1-1000.png)
 
@@ -20,6 +24,8 @@ Num Tx    Tokens   % Distro
 100000    331072    63.14 %
 262143    524268   100.00 %
 ```
+
+This distribution will take a long time to deplete and is an example.
 
 ## The Action Threshold
 
