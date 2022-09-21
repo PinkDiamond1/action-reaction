@@ -4,21 +4,21 @@ A system of contracts demonstrating a decentralized hot wallet using an action t
 
 ## Action Tokens
 
-The action token distribution is handled via a finite supply contract, via a lock and mint combo, incentivising early adoptors with larger rewards of the action token. The reward function decreases logarithmically with each transaction, depleting in 262,143 transactions for a total of 524,268 action tokens.
+The action token distribution is handled via a finite supply contract, via a lock and mint combo, incentivising early adoptors with larger rewards of the action token. The reward function decreases logarithmically with each transaction, depleting in 262,143 transactions for a total of 524,268 action tokens. This specific contract is an example of a token distribution for the repo. The action-reaction system is designed to handle any fungible token, already existing or minted on-the-fly with smart contracts.
 
 ![first 1000 transactions](./images/1-1000.png)
 
-The graph above displays the first 1000 transactions for the action token. It starts at 18 million tokens initially then decays to 9 million over the course of 1000 transactions. Below is a table displaying the number of tokens available in millions and the percentage of the total token distributed.
+The graph above displays the first 1000 transactions for the action token reward function. It starts at 18 million tokens initially then decays to 9 million over the course of 1000 transactions. Below is a table displaying the number of tokens available in millions and the percentage of the total token distributed.
 
 ```
- Num Tx    Tokens   % Distro
-      1        36     0.00 %
-     10       179     0.03 %
-    100      1338     0.25 %
-   1000     10031     1.91 %
-  10000     66387    12.66 %
- 100000    331072    63.14 %
- 262143    524268   100.00 %
+Num Tx    Tokens   % Distro
+     1        36     0.00 %
+    10       179     0.03 %
+   100      1338     0.25 %
+  1000     10031     1.91 %
+ 10000     66387    12.66 %
+100000    331072    63.14 %
+262143    524268   100.00 %
 ```
 
 ## The Action Threshold
@@ -27,11 +27,11 @@ The contracts are designed to determine whether or not a user may perform an act
 
 The action threshold and action token information are held in the voting contract, allowing anyone with at least the threshold amount of action token to change the action threshold parameter. As the token becomes more distributed and decentralized, the ability to obtain enough actions tokens to do single party voting will become sufficiently hard or expensive. Many holders of the action token will need to delegate their action tokens to a representitive. The representitive will act as a signer by holding other user's action tokens and issuing iou tokens in their place. This allows the community to collectively combine their powers together through a single signer to change or act in the system.
 
-## Use Case
+## Use Cases
 
 As the action token becomes more distributed through the Cardano ecosytem, larger and larger representitives will amass inside the system. The collective mass can be used to determine if an action may or may not occur because they hold enough action tokens from enough users that they dominate the system. In this situation, the representitive acts like a single hot wallet. A decentralized approach to a centralized signing structure.
 
-In the example contract, the validator simply checks for reference or user tokens and the correct signatures. This action token checking algorithm can be used as the replacement tx signer function. It can be a replacement for any master key that is being used inside a contract. The action token distribution can also be modified to allow only a select group of holders to accumulate or even just a flat rate for equal participation. It can be form fitted for the exact use case, from federated groups to fully decentralized token distributions.
+In the example contract, the validator simply checks for reference or user tokens and the correct signatures. This action token checking algorithm can be used as the replacement tx signer function. It can be a replacement for any master key that is being used inside a contract. The action token distribution can also be modified to allow only a select group of holders to accumulate, a flat rate for equal participation, or use an already existing token. It is supposed to be form fitted for the exact use case, from federated groups to fully decentralized token distributions.
 
 ### NFT Creation
 
@@ -41,6 +41,8 @@ This example will facilitate the act of petitioning a DAO for a true NFT. A grou
 
 ### Group Voting
 
-An action-reaction system allows a token to be used in combination with known wallets to build a collection of contracts for voting. For example, a simple binary choice can be achieved with one representitive being yes and the other being no, or zero and one or true/false. If one representitive obtains enough action tokens then the vote pass else it will continue until the vote ends and the larger holder wins.
+An action-reaction system allows a token to be used in combination with known wallets to build a collection of contracts for voting. For example, a simple binary choice can be achieved with one representitive being yes and another being no, or zero and one or true/false, etc. If one representitive obtains enough action tokens then the vote passes else it will continue until the vote ends and the larger holder wins. The winner wins by submitting a transaction that updates the datum into a new state.
 
-There are many situations in which a micro-DAO, some anon group of token holders, will be created and some form of voting may be required. The AR system may be applicable in case where a temporary voting token may spawn into existence for some period of time.
+### Micro-DAOs
+
+There are many situations in which a micro-DAO, some anon group of token holders, will form and will require some form of voting. The AR system may be applicable in this case. A temporary voting token spawns into existence for some period of time which becomes the action token for an action-reaction system. Then other contracts can be built using the AR system that does whatever the micro-DAO needs.
