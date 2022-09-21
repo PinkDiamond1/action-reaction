@@ -33,6 +33,8 @@ As the action token becomes more distributed through the Cardano ecosytem, large
 
 In the example contract, the validator simply checks for reference or user tokens and the correct signatures. This action token checking algorithm can be used as the replacement tx signer function. It can be a replacement for any master key that is being used inside a contract. The action token distribution can also be modified to allow only a select group of holders to accumulate, a flat rate for equal participation, or use an already existing token. It is supposed to be form fitted for the exact use case, from federated groups to fully decentralized token distributions.
 
+![Basic Action-Reaction Flow](./images/basic-flow-diagram.png)
+
 ### NFT Creation
 
 An important use case is minting sequential NFTs in a DAO-like setting. In this situation, each member has a singular action token. The action token acts like a n-out-of-m multisig between all DAO members. The DAO has a hot wallet representitive that all the members delegate their action tokens too. The representitive will mint an NFT using a sequential NFT generator, modified for action tokens and vote representation. 
@@ -45,4 +47,8 @@ An action-reaction system allows a token to be used in combination with known wa
 
 ### Micro-DAOs
 
-There are many situations in which a micro-DAO, some anon group of token holders, will form and will require some form of voting. The AR system may be applicable in this case. A temporary voting token spawns into existence for some period of time which becomes the action token for an action-reaction system. Then other contracts can be built using the AR system that does whatever the micro-DAO needs.
+There are many situations in which a micro-DAO, some anon group of token holders, will form and will require some form of voting. The AR system may be applicable in this case. A temporary voting token spawns into existence for some period of time which becomes the action token for an action-reaction system. Then other contracts can be built using the AR system that does whatever the micro-DAO needs. An example is a set of contracts that allows a collection of ada to accrue via an iou exchange. The iou token becomes the action token for a AR system that handles where the ada is staked and how the rewards are paid out.
+
+![Staking Micro-DAO](./images/staking-micro-dao.png)
+
+The flow above describes a possible micro-dao for staking a collection of ADA. The action-reaction system handles the group choice of what pool to stake the ada and how the rewards are paid out to participating wallets. The micro-dao, and thus an action-reaction system, is a natural by-product of group activities that involve some form of iou-style tokens or voting tokens. 
