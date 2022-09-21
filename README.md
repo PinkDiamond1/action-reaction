@@ -1,6 +1,6 @@
 # Action-Reaction
 
-A system of contracts demonstrating a decentralized hot wallet using an action token and vote representation. This is a set of contracts trying to accomplish an action token distribution, action threshold voting, vote representation, and an example contract using a representitive holding action tokens as the signer for a validation function.
+A system of contracts demonstrating a decentralized hot wallet using an action token and vote representation. This is a set of contracts trying to accomplish an action token distribution, action threshold voting, vote representation, and an example contract using a representative holding action tokens as the signer for a validation function.
 
 ### Building
 
@@ -41,11 +41,11 @@ This distribution will take a long time to deplete and is an example.
 
 The contracts are designed to determine whether or not a user may perform an action inside a contract based off of the amount of action tokens held in the transaction. The determining factor is the action threshold, a percentage of the total distribution that must be held inside some transaction.
 
-The action threshold and action token information are held in the voting contract, allowing anyone with at least the threshold amount of action token to change the action threshold parameter. As the token becomes more distributed and decentralized, the ability to obtain enough actions tokens to do single party voting will become sufficiently hard or expensive. Many holders of the action token will need to delegate their action tokens to a representitive. The representitive will act as a signer by holding other user's action tokens and issuing iou tokens in their place. This allows the community to collectively combine their powers together through a single signer to change or act in the system.
+The action threshold and action token information are held in the voting contract, allowing anyone with at least the threshold amount of action token to change the action threshold parameter. As the token becomes more distributed and decentralized, the ability to obtain enough actions tokens to do single party voting will become sufficiently hard or expensive. Many holders of the action token will need to delegate their action tokens to a representative. The representative will act as a signer by holding other user's action tokens and issuing iou tokens in their place. This allows the community to collectively combine their powers together through a single signer to change or act in the system.
 
 ## Use Cases
 
-As the action token becomes more distributed through the Cardano ecosytem, larger and larger representitives will amass inside the system. The collective mass can be used to determine if an action may or may not occur because they hold enough action tokens from enough users that they dominate the system. In this situation, the representitive acts like a single hot wallet. A decentralized approach to a centralized signing structure.
+As the action token becomes more distributed through the Cardano ecosytem, larger and larger representatives will amass inside the system. The collective mass can be used to determine if an action may or may not occur because they hold enough action tokens from enough users that they dominate the system. In this situation, the representative acts like a single hot wallet. A decentralized approach to a centralized signing structure.
 
 In the example contract, the validator simply checks for reference or user tokens and the correct signatures. This action token checking algorithm can be used as the replacement tx signer function. It can be a replacement for any master key that is being used inside a contract. The action token distribution can also be modified to allow only a select group of holders to accumulate, a flat rate for equal participation, or use an already existing token. It is supposed to be form fitted for the exact use case, from federated groups to fully decentralized token distributions.
 
@@ -53,13 +53,13 @@ In the example contract, the validator simply checks for reference or user token
 
 ### NFT Creation
 
-An important use case is minting sequential NFTs in a DAO-like setting. In this situation, each member has a singular action token. The action token acts like a n-out-of-m multisig between all DAO members. The DAO has a hot wallet representitive that all the members delegate their action tokens too. The representitive will mint an NFT using a sequential NFT generator, modified for action tokens and vote representation. 
+An important use case is minting sequential NFTs in a DAO-like setting. In this situation, each member has a singular action token. The action token acts like a n-out-of-m multisig between all DAO members. The DAO has a hot wallet representative that all the members delegate their action tokens too. The representative will mint an NFT using a sequential NFT generator, modified for action tokens and vote representation. 
 
 This example will facilitate the act of petitioning a DAO for a true NFT. A group who gets this NFT or uses the NFT may say that the community of the DAO collectively came together to mint this unique NFT. This type of behavior in the Cardano ecosystem is beneficial for smart contract developers. It is very typical to use an NFT to start a contract. If dApps required that the starting token be minted in a decentralized manner then an option would be to use an action-reaction system for that minting.
 
 ### Group Voting
 
-An action-reaction system allows a token to be used in combination with known wallets to build a collection of contracts for voting. For example, a simple binary choice can be achieved with one representitive being yes and another being no, or zero and one or true/false, etc. If one representitive obtains enough action tokens then the vote passes else it will continue until the vote ends and the larger holder wins. The winner wins by submitting a transaction that updates the datum into a new state.
+An action-reaction system allows a token to be used in combination with known wallets to build a collection of contracts for voting. For example, a simple binary choice can be achieved with one representative being yes and another being no, or zero and one or true/false, etc. If one representative obtains enough action tokens then the vote passes else it will continue until the vote ends and the larger holder wins. The winner wins by submitting a transaction that updates the datum into a new state.
 
 ### Micro-DAOs
 
